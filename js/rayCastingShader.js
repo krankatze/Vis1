@@ -3,10 +3,9 @@ class RayCastingShader extends Shader {
         super("singlePass_vert", "color_frag");
 
         const texture = new THREE.Data3DTexture(volume.voxels, volume.width, volume.height, volume.depth);
-        texture.format = THREE.AlphaFormat;
+        texture.format = THREE.RedFormat;
         texture.type = THREE.FloatType;
         texture.needsUpdate = true;
-        texture.unpackAlignment = 1;
 
         this.setUniform("volume", texture);
     }
