@@ -31,5 +31,7 @@ class Volume {
 
         console.log(this.voxels.length + " voxels loaded - ["
             + this.width + ", " + this.height + ", " + this.depth + "], max: " + this.max);
+
+        this.boundingBox = new THREE.BoxGeometry(this.width, this.height, this.depth);
     }
 }

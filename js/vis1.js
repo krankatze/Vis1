@@ -20,6 +20,8 @@ let container = null;
 let volume = null;
 let fileInput = null;
 let testShader = null;
+let shader = null;
+let material = null;
 
 /**
  * Load all data and initialize UI here.
@@ -70,11 +72,21 @@ async function resetVis(){
     camera = new THREE.PerspectiveCamera( 75, canvasWidth / canvasHeight, 0.1, 1000 );
 
     // dummy scene: we render a box and attach our color test shader as material
+    /*
     const testCube = new THREE.BoxGeometry(volume.width, volume.height, volume.depth);
     const testMaterial = testShader.material;
     await testShader.load(); // this function needs to be called explicitly, and only works within an async function!
     const testMesh = new THREE.Mesh(testCube, testMaterial);
     scene.add(testMesh);
+     */
+
+    // create rayCasting-shader with single pass
+    shader = new RayCastingShader(volume);
+    await shader.load();
+    this.shader.setUniform("scale", volume.scale);
+    this.material = shader.material;
+    const mesh = new THREE.Mesh(volume.boundingBox, this.material);
+    scene.add(mesh);
 
     // our camera orbits around an object centered at (0,0,0)
     orbitCamera = new OrbitCamera(camera, new THREE.Vector3(0,0,0), 2*volume.max, renderer.domElement);
