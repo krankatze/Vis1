@@ -1,0 +1,46 @@
+in vec3 ray_direction;
+in vec3 camera_trans;
+in vec3 position_trans;
+
+uniform vec3 scale;
+uniform highp sampler3D volume;
+
+void main(){
+    vec3 direction = normalize(ray_direction);
+
+    // intersect with bounding box
+    const vec3 box_min = vec3(0);
+    const vec3 box_max = vec3(1);
+    vec3 current_paramMin = (box_min - camera_trans) / direction;
+    vec3 current_paramMax = (box_max - camera_trans) / direction;
+    vec3 paramMin = min(current_paramMin, current_paramMax);
+    vec3 paramMax = max(current_paramMin, current_paramMax);
+    float param0 = max(paramMin.x, max(paramMin.y, paramMin.z));
+    float param1 = min(paramMax.x, min(paramMax.y, paramMax.z));
+    vec2 hit = vec2(param0, param1);
+
+    if (hit.x > hit.y) {
+        discard;
+    }
+    hit.x = max(0.0, hit.x);
+    // start position
+    vec3 current_position = camera_trans + hit.x * ray_direction;
+    // compute the step size
+    vec3 stepSize_dir = 1.0 / vec3(scale);
+    float stepSize = min(stepSize_dir.x, min(stepSize_dir.y, stepSize_dir.z));
+
+    float current_voxel;
+    float opacity = 0.0;
+    vec3 color = vec3(0);
+
+    for (float param = hit.x; param < hit.y; param += stepSize) {
+        current_position += direction * stepSize;
+        current_voxel = texture(volume, current_position.xyz).r;
+
+        if (current_voxel > opacity) {
+            opacity = current_voxel;
+            color = vec3(1.0);
+        }
+    }
+    gl_FragColor = vec4(color, opacity);
+}
