@@ -85,7 +85,6 @@ async function resetVis(){
     this.boundingBox = new THREE.BoxGeometry(volume.width, volume.height, volume.depth);
     this.material = shader.material;
     shader.setUniform("scale", volume.scale);
-    console.log("Scale: " + volume.scale);
     const mesh = new THREE.Mesh(this.boundingBox, this.material);
     scene.add(mesh);
 
@@ -102,7 +101,6 @@ async function resetVis(){
 function paint(){
     if (volume) {
         shader.setUniform("camera", camera.position);
-        console.log(camera.position);
         renderer.render(scene, camera);
     }
 }
