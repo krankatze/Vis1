@@ -1,0 +1,15 @@
+// uniform of the camera position
+uniform vec3 camera;
+// uniform of the scale of the bounding volume
+uniform vec3 scale;
+
+out vec3 ray_direction;
+out vec3 camera_trans;
+flat out vec3 position_trans;
+
+void main() {
+    camera_trans = camera / scale + 0.5;
+    position_trans = position / scale + 0.5;
+    ray_direction = position_trans - camera_trans;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}

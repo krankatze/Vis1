@@ -1,6 +1,6 @@
 class RayCastingShader extends Shader {
     constructor(volume){
-        super("singlePass_vert", "color_frag");
+        super("singlePass_vert", "singlePass_frag");
 
         const texture = new THREE.Data3DTexture(volume.voxels, volume.width, volume.height, volume.depth);
         texture.format = THREE.RedFormat;
