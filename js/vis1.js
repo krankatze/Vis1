@@ -23,6 +23,7 @@ let testShader = null;
 let shader = null;
 let material = null;
 let boundingBox = null;
+let histogram = null;
 
 /**
  * Load all data and initialize UI here.
@@ -90,6 +91,9 @@ async function resetVis(){
 
     // our camera orbits around an object centered at (0,0,0)
     orbitCamera = new OrbitCamera(camera, new THREE.Vector3(0,0,0), 2*volume.max, renderer.domElement);
+
+    histogram = new Histogram(400, 200, volume.voxels)
+    histogram.createHistogram();
 
     // init paint loop
     requestAnimationFrame(paint);
