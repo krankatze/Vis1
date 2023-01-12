@@ -11,25 +11,30 @@ class Histogram{
         // Compute bins.
         const bins = d3.bin().thresholds(40)(volumeVoxels);
 
-        this.xDomain = [bins[0].x0, bins[bins.length - 1].x1];
-        this.yDomain = [0, d3.max(bins, d => d.length)];
+        this.xDomain = [bins[0].x0, bins[bins.length - 1].x1 + 0.1];
+        this.yDomain = [0, d3.max(bins, d => d.length) + 0.1];
+
+        //chart size and margin
+        this.bar = d3.select("#histogram")
+            .append("svg")
+            .attr("width", this.width + 30)
+            .attr("height", this.height + 30)
+            .append("g")
+            .attr("transform", "translate(" + 10 + "," + 0 + ")");
 
         // X axis
         this.x = d3.scaleLinear()
             .domain(this.xDomain)
-            .range([0, this.width - 50]);
+            .range([0, this.width]);
+        this.bar.append("g")
+            .attr("transform", "translate(0," + this.height + ")")
+            .call(d3.axisBottom(this.x));
 
         // Y axis
         this.y = d3.scalePow()
             .exponent(0.3)
             .domain(this.yDomain)
             .range([this.height, 0]);
-
-        //chart size and margin
-        this.bar = d3.select("#histogram")
-            .append("svg")
-            .attr("width", this.width)
-            .attr("height", this.height);
 
         this.bar.append("g")
             .selectAll("rect")
@@ -46,31 +51,6 @@ class Histogram{
             .duration(2000)
             .attr("y", d => this.y(d.length))
             .attr("height", d => this.height - this.y(d.length))
-            .attr("fill", "white");
-
-
+            .attr("fill", "#4b9696");
     }
-
-     makeHist(values) {
-
-        // modify domains of axes, create histogram
-
-        // bind data
-        var rect = svg.selectAll('rect')
-            .data(histogram);
-
-        // add new elements
-        rect.enter().append('rect');
-
-        // update existing elements
-        rect.transition()
-            .duration(3000)
-            .attr('transform', '...');
-
-        // remove old elements
-        rect.exit().remove();
-
-    }
-
-
 }
