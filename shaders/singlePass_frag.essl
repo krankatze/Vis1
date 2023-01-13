@@ -69,7 +69,7 @@ void main(){
             float shiny = max(dot(reflect(-view_direction, normal), view_direction), 0.0);
             float specular = k_specular * pow(shiny, 3.0);
 
-            color = (ambient + diffuse) * vec3(length(normal)) + specular;
+            color = (ambient + diffuse) * vec3(length(normal), 0.2, 0.2) + specular;
 
             previous_position = normal;
             break;
