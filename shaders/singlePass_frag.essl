@@ -42,8 +42,8 @@ void main(){
         current_voxel = texture(volume, current_position.xyz).r;
 
         //if (current_voxel > opacity) {
-          //  opacity = current_voxel;
-            //color = vec3(1.0);
+        //    opacity = current_voxel;
+        //    color = vec3(1.0);
         //}
 
         //checking if iso value between previous density value and next one
@@ -53,14 +53,17 @@ void main(){
         if(iso < upperBound && iso > lowerBound){
         //interpolate
         float linInterPol = (iso - previous_voxel)/(current_voxel - previous_voxel);
-        float finalPos = previous_position + linInterPol * stepSize;
+        vec3 final_position = mix(previous_position, current_position, linInterPol);
 
         //gradient
         float epsilon = 0.004;
+        vec3 epsilonX = vec3(epsilon,0.0,0.0);
+        vec3 epsilonY = vec3(0.0,epsilon,0.0);
+        vec3 epsilonZ = vec3(0.0,0.0,epsilon);
         vec3 normal;
-        normal.x = texture(volume, finalPos.x - epsilon).r - texture(volume, finalPos.x + epsilon).r;
-        normal.y = texture(volume, finalPos.y - epsilon).r - texture(volume, finalPos.y + epsilon).r;
-        normal.z = texture(volume, finalPos.z - epsilon).r - texture(volume, finalPos.z + epsilon).r;
+        normal.x = texture(volume, final_position - epsilonX).r - texture(volume, final_position + epsilonX).r;
+        normal.y = texture(volume, final_position - epsilonY).r - texture(volume, final_position + epsilonY).r;
+        normal.z = texture(volume, final_position - epsilonZ).r - texture(volume, final_position + epsilonZ).r;
 
 
         //calculate Phong Shading
