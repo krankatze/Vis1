@@ -106,7 +106,7 @@ async function resetVis(){
 function paint(){
     if (volume) {
         shader.setUniform("camera", camera.position);
-        shader.setUniform("iso", 0.2);
+        shader.setUniform("iso", 0.27);
         renderer.render(scene, camera);
     }
 }
