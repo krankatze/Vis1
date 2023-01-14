@@ -5,6 +5,7 @@ flat in vec3 position_trans;
 uniform vec3 scale;
 uniform highp sampler3D volume;
 uniform float iso;
+uniform int mode;
 
 void main(){
     vec3 direction = normalize(ray_direction);
@@ -33,6 +34,7 @@ void main(){
 
     float current_voxel;
     vec3 color = vec3(0);
+    float opacity = 0.0;
 
     float previous_voxel = texture(volume, current_position.xyz).r;
 
@@ -40,50 +42,54 @@ void main(){
         current_position += direction * stepSize;
         current_voxel = texture(volume, current_position.xyz).r;
 
-        //checking if iso value between previous density value and next one
-        float lowerBound = min(previous_voxel, current_voxel);
-        float upperBound = max(previous_voxel, current_voxel);
+        if(mode <= 1){
+            //checking if iso value between previous density value and next one
+            float lowerBound = min(previous_voxel, current_voxel);
+            float upperBound = max(previous_voxel, current_voxel);
 
-        if(iso < upperBound && iso > lowerBound){
-            //interpolate
-            float linInterPol = (iso - previous_voxel)/(current_voxel - previous_voxel);
-            //mix() = linear interpolation between previous_position and current_position, using linInterPol to weight between them
-            vec3 final_position = mix(previous_position, current_position, linInterPol);
+            if(iso < upperBound && iso > lowerBound){
+                //interpolate
+                float linInterPol = (iso - previous_voxel)/(current_voxel - previous_voxel);
+                //mix() = linear interpolation between previous_position and current_position, using linInterPol to weight between them
+                vec3 final_position = mix(previous_position, current_position, linInterPol);
 
-            //gradient
-            float epsilon = 0.008;
-            vec3 epsilonX = vec3(epsilon,0.0,0.0);
-            vec3 epsilonY = vec3(0.0,epsilon,0.0);
-            vec3 epsilonZ = vec3(0.0,0.0,epsilon);
-            vec3 normal;
-            normal.x = texture(volume, final_position - epsilonX).r - texture(volume, final_position + epsilonX).r;
-            normal.y = texture(volume, final_position - epsilonY).r - texture(volume, final_position + epsilonY).r;
-            normal.z = texture(volume, final_position - epsilonZ).r - texture(volume, final_position + epsilonZ).r;
+                //gradient
+                float epsilon = 0.008;
+                vec3 epsilonX = vec3(epsilon,0.0,0.0);
+                vec3 epsilonY = vec3(0.0,epsilon,0.0);
+                vec3 epsilonZ = vec3(0.0,0.0,epsilon);
+                vec3 normal;
+                normal.x = texture(volume, final_position - epsilonX).r - texture(volume, final_position + epsilonX).r;
+                normal.y = texture(volume, final_position - epsilonY).r - texture(volume, final_position + epsilonY).r;
+                normal.z = texture(volume, final_position - epsilonZ).r - texture(volume, final_position + epsilonZ).r;
 
-            //calculate Phong Shading
-            vec3 view_direction = direction;
-            float k_ambient = 1.0;
-            float ambient = k_ambient;
-            float k_diffuse = 0.5;
-            float diffuse = max(k_diffuse * dot(-view_direction, normal), 0.0);
-            float k_specular = 0.1;
-            float shininess = max(dot(reflect(-view_direction, normal), view_direction), 0.0);
-            float specular = k_specular * pow(shininess, 3.0);
+                //calculate Phong Shading
+                vec3 view_direction = direction;
+                float k_ambient = 1.0;
+                float ambient = k_ambient;
+                float k_diffuse = 0.5;
+                float diffuse = max(k_diffuse * dot(-view_direction, normal), 0.0);
+                float k_specular = 0.1;
+                float shininess = max(dot(reflect(-view_direction, normal), view_direction), 0.0);
+                float specular = k_specular * pow(shininess, 3.0);
 
-            color = (ambient + diffuse) * vec3(length(normal), 0.2, 0.2) + specular;
-
-            previous_position = normal;
-            break;
+                color = (ambient + diffuse) * vec3(length(normal), 0.2, 0.2) + specular;
+                opacity = 1.0;
+                previous_position = normal;
+                break;
+            }
         }
         previous_voxel = current_voxel;
         previous_position = current_position;
 
      // MIP
-     // if (current_voxel > opacity) {
-     //     opacity = current_voxel;
-     //     color = vec3(1.0);
-     // }
+     if(mode>=2){
+      if (current_voxel > opacity) {
+          opacity = current_voxel;
+          color = vec3(1.0);
+      }
+     }
 
     }
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, opacity);
 }

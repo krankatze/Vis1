@@ -24,6 +24,7 @@ let shader = null;
 let material = null;
 let boundingBox = null;
 let histogram = null;
+let mode = 1;
 
 /**
  * Load all data and initialize UI here.
@@ -100,6 +101,10 @@ async function resetVis(){
     requestAnimationFrame(paint);
 }
 
+function changeMode(mode){
+    this.mode = mode;
+}
+
 /**
  * Render the scene and update all necessary shader information.
  */
@@ -107,6 +112,7 @@ function paint(){
     if (volume) {
         shader.setUniform("camera", camera.position);
         shader.setUniform("iso", 0.27);
+        shader.setUniform("mode", this.mode);
         renderer.render(scene, camera);
     }
 }
