@@ -65,8 +65,7 @@ void main(){
 
                 //calculate Phong Shading
                 vec3 view_direction = direction;
-                float k_ambient = 1.0;
-                float ambient = k_ambient;
+                float ambient = 1.0;
                 float k_diffuse = 0.5;
                 float diffuse = max(k_diffuse * dot(-view_direction, normal), 0.0);
                 float k_specular = 0.1;
